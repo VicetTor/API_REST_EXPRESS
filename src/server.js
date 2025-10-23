@@ -12,34 +12,23 @@
 
 
 import express from 'express'
+import questionsRouter from './routers/questionsRouter.js'
+import usersRouter from './routers/usersRouter.js'
+import logger from './middleware/logger.js'
 
 const PORT = process.env.PORT || 3000
 
 const app = express()
 
-app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`)
-})
-
 app.use(express.json())
 
-app.get('/questions', (req, res)=>{
-    res.status(200).send([
-        {
-            id:"1",
-            question:"Quelle est la capitale de la France ?",
-            answer:"Paris"
-        },
-    ])
-})
+app.use(logger)
 
-// /questions avec un s car on accède à la ressouce qui est une liste et on y ajoute une question
-app.post('/questions', (req, res)=>{
-    const { question , answer } = req.body
+// Request -> express.json() -> Middleware (Logger) -> Controller -> Response
+// questions avec un s car on accède à la ressouce qui est une liste et on y ajoute une question ou supprime
+app.use('/questions', questionsRouter)
+app.use('/users', usersRouter)
 
-    if(!question || !answer){
-        return res(400).send({error: "Question and answer are required"})
-    }
-
-    res.status(201).send({message: 'Question created'})
+app.listen(PORT, () => {
+    console.log(`Server running on http://localhost:${PORT}`)
 })
